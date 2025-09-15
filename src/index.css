@@ -1,0 +1,22 @@
+body {
+  margin: 0;
+  background: #eef2f7;
+  font-size: 16px;
+}
+
+/* スマホ（最大幅768px程度）だけ縦画面を強制 */
+@media screen and (max-width: 768px) {
+  @media (orientation: landscape) {
+    body {
+      transform: rotate(90deg);
+      transform-origin: left top;
+      width: 100vh;
+      height: 100vw;
+      overflow-x: hidden;
+      position: absolute;
+      top: 100%;
+      left: 0;
+    }
+  }
+}
+
