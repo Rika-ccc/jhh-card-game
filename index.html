@@ -4,21 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>JHHカードゲーム</title>
-  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <h1>JHHカードゲーム</h1>
-  </header>
-  <main>
-    <div id="deck" tabindex="0">山札</div>
-    <section class="game-container">
-      <div id="board" aria-label="場"></div>
-      <div id="hand" aria-label="手札"></div>
-    </section>
-    <button id="saveBtn">場を画像として保存</button>
-  </main>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="app.js"></script>
+  <div id="root"></div>
+  <!-- Reactのビルド後のmainファイルを読み込む（例: Vite, CRA, Next.js等に応じてパスを調整） -->
+  <script type="module" src="/src/main.tsx"></script>
 </body>
 </html>
