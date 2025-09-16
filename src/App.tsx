@@ -104,11 +104,12 @@ const App: React.FC = () => {
                 style={{
                   background: "#fff", border: "2.5px solid #222", borderRadius: 8,
                   display: "flex", justifyContent: "center", alignItems: "center",
-                  fontFamily: '"Segoe UI", sans-serif", fontSize: "1.25rem",
+                  fontFamily: '"Segoe UI", sans-serif',
+                  fontSize: "1.25rem",
                   color: "#222", cursor: "pointer", boxShadow: "1.5px 1.5px 6px rgba(0,0,0,0.10)",
                   transition: "transform 0.15s, box-shadow 0.15s", userSelect: "none",
                   whiteSpace: "pre-line", textAlign: "center", overflow: "hidden", padding: "0 4px",
-                  position: "relative", zIndex: 2, width: 80, height: 120, fontSize: "1.25rem"
+                  position: "relative", zIndex: 2, width: 80, height: 120
                 }}
                 onClick={() => returnCard(idx)}
                 tabIndex={0}
@@ -139,7 +140,7 @@ const App: React.FC = () => {
                   color: "#222", cursor: "pointer", boxShadow: "1.5px 1.5px 6px rgba(0,0,0,0.10)",
                   transition: "transform 0.15s, box-shadow 0.15s", userSelect: "none",
                   whiteSpace: "pre-line", textAlign: "center", overflow: "hidden", padding: "0 4px",
-                  position: "relative", zIndex: 2, width: 60, height: 90, fontSize: "1rem"
+                  position: "relative", zIndex: 2, width: 60, height: 90
                 }}
                 onClick={() => playCard(idx)}
                 tabIndex={0}
