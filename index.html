@@ -5,13 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>JHHカードゲーム</title>
   <style>
-    /* =========================
-       全体背景
-       ========================= */
     body {
       margin: 0;
       font-family: "Segoe UI", sans-serif;
-      background: linear-gradient(135deg, #ffe6f0, #fff0f6); /* パステルピンク基調 */
+      background: linear-gradient(135deg, #ffe6f0, #fff0f6);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -25,9 +22,6 @@
       font-size: 1.5rem;
     }
 
-    /* =========================
-       山札
-       ========================= */
     #deck {
       width: 22vw;
       height: 12vh;
@@ -50,9 +44,6 @@
       background: #ffb0cf;
     }
 
-    /* =========================
-       ゲームコンテナ
-       ========================= */
     .game-container {
       flex: 1;
       width: 100%;
@@ -64,9 +55,6 @@
       box-sizing: border-box;
     }
 
-    /* =========================
-       場エリア
-       ========================= */
     #board {
       flex: 2;
       width: 90%;
@@ -82,9 +70,6 @@
       box-sizing: border-box;
     }
 
-    /* =========================
-       手札エリア
-       ========================= */
     #hand {
       flex: 1;
       width: 90%;
@@ -100,11 +85,8 @@
       margin-bottom: 1vh;
     }
 
-    /* =========================
-       カードデザイン
-       ========================= */
     .card {
-      width: 60px;  /* 手札カード */
+      width: 60px;
       height: 90px;
       background: white;
       border: 2px solid #e89ab5;
@@ -119,15 +101,16 @@
       box-shadow: 2px 2px 6px rgba(0,0,0,0.15);
       transition: transform 0.2s, background 0.2s;
       color: #d94f7d;
+      overflow: hidden;          /* はみ出し防止 */
+      line-height: 1.2;          /* 行間調整 */
+      white-space: normal;       /* テキスト改行許可 */
+      word-break: keep-all;      /* 不要な分割を防ぐ */
     }
     .card:hover {
       transform: translateY(-5px);
       background: #ffe0f0;
     }
 
-    /* =========================
-       場カード専用
-       ========================= */
     .field-card {
       width: 90px;
       height: 130px;
@@ -151,6 +134,21 @@
         font-size: 4vw;
       }
     }
+
+    #saveBtn {
+      margin: 10px;
+      padding: 8px 16px;
+      background: #ff99bb;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      color: white;
+      cursor: pointer;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+    }
+    #saveBtn:hover {
+      background: #ff7799;
+    }
   </style>
 </head>
 <body>
@@ -160,15 +158,20 @@
     <div id="board"></div>
     <div id="hand"></div>
   </div>
+  <button id="saveBtn">場を画像として保存</button>
+
+  <!-- html2canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <script>
-    const WORDS = ["さんま","ポニー","が","は","で","ピンク","ラヴァー","鬼頭の一族","真下","正義","ヘイヘイ","ヒューイ","そいつ","こそ","王子様","プリンセス","それ","あれ","これ","どれ","真実","ホームルーム","テニス","おばけ","バスケ","黒子","っち","船","動かない","沈まない","！","？","君","あなた","ペット","ポテト","の","ショベルカー","人生","お見事","です","し","ます","でござる","有頂天","大和撫子","七変化","人","すみません","どこ","ここ","か","バカンス","ダメ","な","もう一回","予想以上に","のたうち回るほど","に","やばい","考えられない","ダイエット","邪な","おじさん","構文","ネコチャン","だよ","!(^^)!","JHH","ミア","水都","なあこ","恋","いちい","モモコ","エイコ","大和","かおり","シュッ","アチッ","ねじれ国会","紙子","いちいの絵茶","荒らし","幻","水上敏志","リーマス","シリウス","ポッター","ドビーめ","ドビーは悪い子","ドビーは悪い子","甘い歌声","最終電車","ほっかほか","芋男爵","芋","芋","芋芋芋","うゅん","坂田銀時","公認","公式の女","セブルス","ゴドリック・グリフィンドール","ワッフルチン","同人誌","即売会","実写","100本のバラ","それは","百合","天上天下","唯我独尊","日本","イギリス","フランス","アメリカ","ジレンマ","抱える","たおやかに","受け入れる","しかない","しょうがない","走る","永遠に","どこまでも","あまりにも","つらい","嬉しい","悲しい","許せない","神よ","許します","崇め奉れ","30分","一億年","素敵だね","お互い様","こわい","ホー","珍宝","大きい","小さい","どうぞ","よろしく","お願いします","違法","アインシュタイン","ゲート","新しい","古い","男","女","友達","そいつ","ここから","始まる","TRUE LOVE","REBORN","オシム","惜しい","ストラテコブブウィッチ","恋愛経験値","五億","五千","エリート","驚愕の","ありがとう","感謝","圧倒的","おたんこナース","浩一郎くん","古谷","エンディングノート","パンツ","落ちてる","首が長い","やめてよ","思いついたのさ","ベイベー","美味しい","食べる","いただきます","納得できる","なってます","って何？","ビビっちまったよ","ビビビ","ビーム★","正解","なんてない","ダウンロード","及川","金魚","ミントな僕ら","懐かしい","ね","よ","正直に","可能性がある","の","どや顔","負けた","勝った","買った","リリカルな","おでん","デデンデンデデン","デデンデンデデン","伸びた","デビュー","先生","生徒","チャレンジ","ティエリア","痔","うっかり","しっかり","成仏","鳥籠","ゴルゴ"];
+    const WORDS = ["さんま","ポニー","が","は","で","ピンク","ラヴァー","ゴルゴ"];
     let hand = [];
     let board = [];
 
     const deckEl = document.getElementById("deck");
     const handEl = document.getElementById("hand");
     const boardEl = document.getElementById("board");
+    const saveBtn = document.getElementById("saveBtn");
 
     function drawHand() {
       hand = [];
@@ -185,7 +188,7 @@
       handEl.innerHTML = "";
       hand.forEach((word, index) => {
         const card = document.createElement("div");
-        card.className = "card"; // 手札カード
+        card.className = "card";
         card.textContent = word;
         card.onclick = () => playCard(index);
         handEl.appendChild(card);
@@ -194,10 +197,11 @@
 
     function renderBoard() {
       boardEl.innerHTML = "";
-      board.forEach(word => {
+      board.forEach((word, index) => {
         const card = document.createElement("div");
-        card.className = "card field-card"; // 場カードだけ大きい
+        card.className = "card field-card";
         card.textContent = word;
+        card.onclick = () => returnCard(index);
         boardEl.appendChild(card);
       });
     }
@@ -209,7 +213,24 @@
       renderBoard();
     }
 
+    function returnCard(index) {
+      hand.push(board[index]);
+      board.splice(index, 1);
+      renderHand();
+      renderBoard();
+    }
+
     deckEl.onclick = drawHand;
+
+    // 場だけ保存
+    saveBtn.onclick = () => {
+      html2canvas(boardEl, { scale: 3, backgroundColor: null }).then(canvas => {
+        const link = document.createElement("a");
+        link.href = canvas.toDataURL("image/png");
+        link.download = "board.png";
+        link.click();
+      });
+    };
   </script>
 </body>
 </html>
