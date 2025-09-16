@@ -1,121 +1,165 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import html2canvas from "html2canvas";
-import CardArea from "./components/CardArea";
-import { WORDS } from "./data/words";
+
+const WORDS = [
+  "さんま","ポニー","が","は","で","ピンク","ラヴァー","鬼頭の一族","真下","正義","ヘイヘイ","ヒューイ","そいつ","こそ","王子様","プリンセス","それ","あれ","これ","どれ","真実","ホームルーム","テニス","おばけ","バスケ","黒子","っち","船","動かない","沈まない","！","？","君","あなた","ペット","ポテト","の","ショベルカー","人生","お見事","です","し","ます","でござる","有頂天","大和撫子","七変化","人","すみません","どこ","ここ","か","バカンス","ダメ","な","もう一回","予想以上に","のたうち回るほど","に","やばい","考えられない","ダイエット","邪な","おじさん","構文","ネコチャン","だよ","!(^^)!","JHH","ミア","水都","なあこ","恋","いちい","モモコ","エイコ","大和","かおり","シュッ","アチッ","ねじれ国会","紙子","いちいの絵茶","荒らし","幻","水上敏志","リーマス","シリウス","ポッター","ドビーめ","ドビーは悪い子","ドビーは悪い子","甘い歌声","最終電車","ほっかほか","芋男爵","芋","芋","芋芋芋","うゅん","坂田銀時","公認","公式の女","セブルス","ゴドリック・グリフィンドール","ワッフルチン","同人誌","即売会","実写","100本のバラ","それは","百合","天上天下","唯我独尊","日本","イギリス","フランス","アメリカ","ジレンマ","抱える","たおやかに","受け入れる","しかない","しょうがない","走る","永遠に","どこまでも","あまりにも","つらい","嬉しい","悲しい","許せない","神よ","許します","崇め奉れ","30分","一億年","素敵だね","お互い様","こわい","ホー","珍宝","大きい","小さい","どうぞ","よろしく","お願いします","違法","アインシュタイン","ゲート","新しい","古い","男","女","友達","そいつ","ここから","始まる","TRUE LOVE","REBORN","オシム","惜しい","ストラテコブブウィッチ","恋愛経験値","五億","五千","エリート","驚愕の","ありがとう","感謝","圧倒的","おたんこナース","浩一郎くん","古谷","エンディングノート","パンツ","落ちてる","首が長い","やめてよ","思いついたのさ","ベイベー","美味しい","食べる","いただきます","納得できる","なってます","って何？","ビビっちまったよ","ビビビ","ビーム★","正解","なんてない","ダウンロード","及川","金魚","ミントな僕ら","懐かしい","ね","よ","正直に","可能性がある","の","どや顔","負けた","勝った","買った","リリカルな","おでん","デデンデンデデン","デデンデンデデン","伸びた","デビュー","先生","生徒","チャレンジ","ティエリア","痔","うっかり","しっかり","成仏","鳥籠","ゴルゴ"
+];
+
+function getRandomHand(): string[] {
+  return Array.from({ length: 7 }, () => WORDS[Math.floor(Math.random() * WORDS.length)]);
+}
 
 const App: React.FC = () => {
-  const [hand, setHand] = useState<string[]>([]);
-  const [field, setField] = useState<string[]>([]);
+  const [hand, setHand] = useState<string[]>(getRandomHand());
+  const [board, setBoard] = useState<string[]>([]);
+  const boardRef = useRef<HTMLDivElement>(null);
 
-  // 山札クリックで手札生成（リセット）
   const drawHand = () => {
-    const shuffled = [...WORDS].sort(() => 0.5 - Math.random());
-    setHand(shuffled.slice(0, 5));
-    setField([]);
+    setHand(getRandomHand());
+    setBoard([]);
   };
 
-  // 手札 → 場
-  const playCard = (word: string) => {
-    setField([...field, word]);
-    setHand(hand.filter((w) => w !== word));
+  const playCard = (idx: number) => {
+    setBoard([...board, hand[idx]]);
+    setHand(hand.filter((_, i) => i !== idx));
   };
 
-  // 場 → 手札
-  const returnCard = (word: string) => {
-    setHand([...hand, word]);
-    setField(field.filter((w) => w !== word));
+  const returnCard = (idx: number) => {
+    setHand([...hand, board[idx]]);
+    setBoard(board.filter((_, i) => i !== idx));
   };
 
-  // 場を画像として保存
-  const saveField = async () => {
-    const fieldEl = document.getElementById("field");
-    if (!fieldEl) return;
-
-    const canvas = await html2canvas(fieldEl, {
-      scale: 2, // 高解像度化で文字ずれ軽減
+  const saveBoardImage = async () => {
+    if (!boardRef.current) return;
+    const canvas = await html2canvas(boardRef.current, {
+      scale: 2,
+      backgroundColor: "#eaeaea",
       useCORS: true,
+      onclone: (doc) => {
+        doc.querySelectorAll('.card').forEach(card => {
+          (card as HTMLElement).style.fontFamily = '"Segoe UI", sans-serif';
+          (card as HTMLElement).style.fontSize = window.getComputedStyle(card as HTMLElement).fontSize;
+          (card as HTMLElement).style.color = "#222";
+          (card as HTMLElement).style.background = "#fff";
+          (card as HTMLElement).style.border = "2.5px solid #222";
+          (card as HTMLElement).style.boxSizing = "border-box";
+          (card as HTMLElement).style.display = "flex";
+          (card as HTMLElement).style.alignItems = "center";
+          (card as HTMLElement).style.justifyContent = "center";
+          (card as HTMLElement).style.overflow = "hidden";
+          (card as HTMLElement).style.padding = "0 4px";
+        });
+      }
     });
     const link = document.createElement("a");
-    link.download = "field.png";
     link.href = canvas.toDataURL("image/png");
+    link.download = "board.png";
     link.click();
   };
 
   return (
-    <div style={{ padding: "10px", fontFamily: "sans-serif" }}>
-      <h1>JHHカードゲーム</h1>
-
-      {/* 山札 */}
-      <div
-        id="deck"
-        onClick={drawHand}
-        style={{
-          width: "60px",
-          height: "90px",
-          background:
-            "repeating-linear-gradient(45deg,#ff6f61,#ff6f61 10px,#ffcc00 10px,#ffcc00 20px)",
-          border: "2px solid #333",
-          borderRadius: "8px",
-          margin: "0 auto 10px",
-          cursor: "pointer",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          color: "white",
-          fontWeight: "bold",
-        }}
-      >
-        山札
-      </div>
-
-      {/* 場 */}
-      <div
-        id="field"
-        style={{
-          border: "2px dashed #666",
-          background: "#f9f9f9",
-          minHeight: "120px",
-          padding: "10px",
-          display: "flex",
-          flexWrap: "nowrap", // 折り返さず横並び
-          gap: "10px",
-          justifyContent: "flex-start",
-          overflow: "hidden", // はみ出し抑制
-        }}
-      >
-        <CardArea cards={field} onCardClick={returnCard} autoResize />
-      </div>
-
-      <button
-        onClick={saveField}
-        style={{
-          display: "block",
-          margin: "10px auto",
-          padding: "10px",
-          fontSize: "1rem",
-          borderRadius: "6px",
-          border: "none",
-          background: "#ff6f61",
-          color: "white",
-          cursor: "pointer",
-        }}
-      >
-        場を画像として保存
-      </button>
-
-      {/* 手札 */}
-      <div
-        id="hand"
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          gap: "10px",
-          padding: "10px",
-          background: "rgba(255,255,255,0.6)",
-        }}
-      >
-        <CardArea cards={hand} onCardClick={playCard} />
-      </div>
+    <div style={{
+      fontFamily: '"Segoe UI", sans-serif',
+      background: "#f7f7f7",
+      minHeight: "100vh",
+      margin: 0,
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center"
+    }}>
+      <header>
+        <h1 style={{ color: "#333", margin: "20px 0 10px", fontSize: "1.7rem", textAlign: "center" }}>JHHカードゲーム</h1>
+      </header>
+      <main style={{ width: "100vw", maxWidth: 600 }}>
+        <div
+          id="deck"
+          tabIndex={0}
+          style={{
+            width: 80, height: 120, background: "#fff", border: "2.5px solid #222", borderRadius: 10,
+            display: "flex", justifyContent: "center", alignItems: "center", fontWeight: "bold",
+            fontSize: "1.2rem", cursor: "pointer", boxShadow: "2px 2px 8px rgba(0,0,0,0.12)",
+            margin: "16px 0", color: "#222", outline: "none", userSelect: "none"
+          }}
+          onClick={drawHand}
+          onKeyDown={e => { if (e.key === "Enter" || e.key === " ") drawHand(); }}
+        >山札</div>
+        <section className="game-container" style={{
+          width: "100vw", maxWidth: 600, display: "flex", flexDirection: "column", alignItems: "center", gap: 18, padding: 0, boxSizing: "border-box"
+        }}>
+          <div
+            id="board"
+            aria-label="場"
+            ref={boardRef}
+            style={{
+              width: "98vw", maxWidth: 600, minHeight: 180, height: 180,
+              display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center",
+              gap: 16, background: "#eaeaea", border: "2px solid #bbb", borderRadius: 24,
+              padding: 0, boxSizing: "border-box", overflowX: "auto", overflowY: "hidden", position: "relative", zIndex: 1
+            }}
+          >
+            {board.map((word, idx) => (
+              <div
+                key={idx}
+                className="card field-card"
+                style={{
+                  background: "#fff", border: "2.5px solid #222", borderRadius: 8,
+                  display: "flex", justifyContent: "center", alignItems: "center",
+                  fontFamily: '"Segoe UI", sans-serif", fontSize: "1.25rem",
+                  color: "#222", cursor: "pointer", boxShadow: "1.5px 1.5px 6px rgba(0,0,0,0.10)",
+                  transition: "transform 0.15s, box-shadow 0.15s", userSelect: "none",
+                  whiteSpace: "pre-line", textAlign: "center", overflow: "hidden", padding: "0 4px",
+                  position: "relative", zIndex: 2, width: 80, height: 120, fontSize: "1.25rem"
+                }}
+                onClick={() => returnCard(idx)}
+                tabIndex={0}
+                onKeyDown={e => { if (e.key === "Enter" || e.key === " ") returnCard(idx); }}
+                onMouseOver={e => { (e.currentTarget as HTMLElement).style.transform = "scale(1.04)"; (e.currentTarget as HTMLElement).style.boxShadow = "2.5px 2.5px 10px rgba(0,0,0,0.13)"; }}
+                onMouseOut={e => { (e.currentTarget as HTMLElement).style.transform = ""; (e.currentTarget as HTMLElement).style.boxShadow = "1.5px 1.5px 6px rgba(0,0,0,0.10)"; }}
+              >{word}</div>
+            ))}
+          </div>
+          <div
+            id="hand"
+            aria-label="手札"
+            style={{
+              width: "98vw", maxWidth: 600, minHeight: 140, height: 140,
+              display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center",
+              gap: 16, background: "#f5f5f5", border: "2px solid #bbb", borderRadius: 24,
+              padding: 0, boxSizing: "border-box", overflowX: "auto", overflowY: "hidden", position: "relative", zIndex: 1
+            }}
+          >
+            {hand.map((word, idx) => (
+              <div
+                key={idx}
+                className="card hand-card"
+                style={{
+                  background: "#fff", border: "2.5px solid #222", borderRadius: 8,
+                  display: "flex", justifyContent: "center", alignItems: "center",
+                  fontFamily: '"Segoe UI", sans-serif', fontSize: "1rem",
+                  color: "#222", cursor: "pointer", boxShadow: "1.5px 1.5px 6px rgba(0,0,0,0.10)",
+                  transition: "transform 0.15s, box-shadow 0.15s", userSelect: "none",
+                  whiteSpace: "pre-line", textAlign: "center", overflow: "hidden", padding: "0 4px",
+                  position: "relative", zIndex: 2, width: 60, height: 90, fontSize: "1rem"
+                }}
+                onClick={() => playCard(idx)}
+                tabIndex={0}
+                onKeyDown={e => { if (e.key === "Enter" || e.key === " ") playCard(idx); }}
+                onMouseOver={e => { (e.currentTarget as HTMLElement).style.transform = "scale(1.04)"; (e.currentTarget as HTMLElement).style.boxShadow = "2.5px 2.5px 10px rgba(0,0,0,0.13)"; }}
+                onMouseOut={e => { (e.currentTarget as HTMLElement).style.transform = ""; (e.currentTarget as HTMLElement).style.boxShadow = "1.5px 1.5px 6px rgba(0,0,0,0.10)"; }}
+              >{word}</div>
+            ))}
+          </div>
+        </section>
+        <button
+          id="saveBtn"
+          style={{
+            margin: "12px 0 24px 0", padding: "8px 18px", background: "#333", border: "none",
+            borderRadius: 8, fontSize: "1rem", color: "#fff", cursor: "pointer",
+            boxShadow: "1.5px 1.5px 6px rgba(0,0,0,0.10)", transition: "background 0.2s"
+          }}
+          onClick={saveBoardImage}
+        >場を画像として保存</button>
+      </main>
     </div>
   );
 };
