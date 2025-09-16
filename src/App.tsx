@@ -9,9 +9,18 @@ function getRandomHand(): string[] {
   return Array.from({ length: 7 }, () => WORDS[Math.floor(Math.random() * WORDS.length)]);
 }
 
+// カード内の文字サイズを自動調整する関数
+function getCardFontSize(text: string, isField: boolean) {
+  const base = isField ? 1.25 : 1.0;
+  if (text.length <= 5) return `${base}rem`;
+  if (text.length <= 8) return `${base * 0.9}rem`;
+  if (text.length <= 12) return `${base * 0.8}rem`;
+  return `${base * 0.7}rem`;
+}
+
 const App: React.FC = () => {
-  const [hand, setHand] = useState<string[]>(getRandomHand());
-  const [board, setBoard] = useState<string[]>([]);
+  const [hand, setHand] = React.useState<string[]>(getRandomHand());
+  const [board, setBoard] = React.useState<string[]>([]);
   const boardRef = useRef<HTMLDivElement>(null);
 
   const drawHand = () => {
@@ -48,6 +57,7 @@ const App: React.FC = () => {
           (card as HTMLElement).style.justifyContent = "center";
           (card as HTMLElement).style.overflow = "hidden";
           (card as HTMLElement).style.padding = "0 4px";
+          (card as HTMLElement).style.wordBreak = "break-all";
         });
       }
     });
@@ -55,6 +65,27 @@ const App: React.FC = () => {
     link.href = canvas.toDataURL("image/png");
     link.download = "board.png";
     link.click();
+  };
+
+  // スマホ対応のためのレスポンシブサイズ
+  const isMobile = window.innerWidth <= 600;
+  const fieldCard = {
+    width: isMobile ? "19vw" : 80,
+    minWidth: isMobile ? 56 : 80,
+    maxWidth: isMobile ? 80 : 80,
+    height: isMobile ? "28vw" : 120,
+    minHeight: isMobile ? 80 : 120,
+    maxHeight: isMobile ? 120 : 120,
+    fontSize: "1.25rem",
+  };
+  const handCard = {
+    width: isMobile ? "13vw" : 60,
+    minWidth: isMobile ? 40 : 60,
+    maxWidth: isMobile ? 60 : 60,
+    height: isMobile ? "20vw" : 90,
+    minHeight: isMobile ? 60 : 90,
+    maxHeight: isMobile ? 90 : 90,
+    fontSize: "1rem",
   };
 
   return (
@@ -70,7 +101,7 @@ const App: React.FC = () => {
       <header>
         <h1 style={{ color: "#333", margin: "20px 0 10px", fontSize: "1.7rem", textAlign: "center" }}>JHHカードゲーム</h1>
       </header>
-      <main style={{ width: "100vw", maxWidth: 600 }}>
+      <main style={{ width: "100vw", maxWidth: 600, margin: "0 auto" }}>
         <div
           id="deck"
           tabIndex={0}
@@ -78,7 +109,7 @@ const App: React.FC = () => {
             width: 80, height: 120, background: "#fff", border: "2.5px solid #222", borderRadius: 10,
             display: "flex", justifyContent: "center", alignItems: "center", fontWeight: "bold",
             fontSize: "1.2rem", cursor: "pointer", boxShadow: "2px 2px 8px rgba(0,0,0,0.12)",
-            margin: "16px 0", color: "#222", outline: "none", userSelect: "none"
+            margin: "16px auto", color: "#222", outline: "none", userSelect: "none"
           }}
           onClick={drawHand}
           onKeyDown={e => { if (e.key === "Enter" || e.key === " ") drawHand(); }}
@@ -91,9 +122,9 @@ const App: React.FC = () => {
             aria-label="場"
             ref={boardRef}
             style={{
-              width: "98vw", maxWidth: 600, minHeight: 180, height: 180,
+              width: "98vw", maxWidth: 600, minHeight: isMobile ? "32vw" : 180, height: isMobile ? "36vw" : 180,
               display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center",
-              gap: 16, background: "#eaeaea", border: "2px solid #bbb", borderRadius: 24,
+              gap: 8, background: "#eaeaea", border: "2px solid #bbb", borderRadius: 24,
               padding: 0, boxSizing: "border-box", overflowX: "auto", overflowY: "hidden", position: "relative", zIndex: 1
             }}
           >
@@ -102,14 +133,16 @@ const App: React.FC = () => {
                 key={idx}
                 className="card field-card"
                 style={{
+                  ...fieldCard,
                   background: "#fff", border: "2.5px solid #222", borderRadius: 8,
                   display: "flex", justifyContent: "center", alignItems: "center",
                   fontFamily: '"Segoe UI", sans-serif',
-                  fontSize: "1.25rem",
                   color: "#222", cursor: "pointer", boxShadow: "1.5px 1.5px 6px rgba(0,0,0,0.10)",
                   transition: "transform 0.15s, box-shadow 0.15s", userSelect: "none",
                   whiteSpace: "pre-line", textAlign: "center", overflow: "hidden", padding: "0 4px",
-                  position: "relative", zIndex: 2, width: 80, height: 120
+                  position: "relative", zIndex: 2,
+                  fontSize: getCardFontSize(word, true),
+                  wordBreak: "break-all"
                 }}
                 onClick={() => returnCard(idx)}
                 tabIndex={0}
@@ -123,9 +156,9 @@ const App: React.FC = () => {
             id="hand"
             aria-label="手札"
             style={{
-              width: "98vw", maxWidth: 600, minHeight: 140, height: 140,
+              width: "98vw", maxWidth: 600, minHeight: isMobile ? "22vw" : 140, height: isMobile ? "26vw" : 140,
               display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center",
-              gap: 16, background: "#f5f5f5", border: "2px solid #bbb", borderRadius: 24,
+              gap: 8, background: "#f5f5f5", border: "2px solid #bbb", borderRadius: 24,
               padding: 0, boxSizing: "border-box", overflowX: "auto", overflowY: "hidden", position: "relative", zIndex: 1
             }}
           >
@@ -134,13 +167,16 @@ const App: React.FC = () => {
                 key={idx}
                 className="card hand-card"
                 style={{
+                  ...handCard,
                   background: "#fff", border: "2.5px solid #222", borderRadius: 8,
                   display: "flex", justifyContent: "center", alignItems: "center",
-                  fontFamily: '"Segoe UI", sans-serif', fontSize: "1rem",
+                  fontFamily: '"Segoe UI", sans-serif',
                   color: "#222", cursor: "pointer", boxShadow: "1.5px 1.5px 6px rgba(0,0,0,0.10)",
-                  transition: "transform 0.15s, box-shadow 0.15s", userSelect: "none",
+                  transition: "transform 0.15s, boxShadow 0.15s", userSelect: "none",
                   whiteSpace: "pre-line", textAlign: "center", overflow: "hidden", padding: "0 4px",
-                  position: "relative", zIndex: 2, width: 60, height: 90
+                  position: "relative", zIndex: 2,
+                  fontSize: getCardFontSize(word, false),
+                  wordBreak: "break-all"
                 }}
                 onClick={() => playCard(idx)}
                 tabIndex={0}
