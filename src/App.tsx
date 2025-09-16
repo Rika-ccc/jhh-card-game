@@ -14,16 +14,27 @@ const App: React.FC = () => {
     setField([]);
   };
 
+  // 手札 → 場
   const playCard = (word: string) => {
     setField([...field, word]);
     setHand(hand.filter((w) => w !== word));
   };
 
+  // 場 → 手札
+  const returnCard = (word: string) => {
+    setHand([...hand, word]);
+    setField(field.filter((w) => w !== word));
+  };
+
+  // 場を画像として保存
   const saveField = async () => {
     const fieldEl = document.getElementById("field");
     if (!fieldEl) return;
 
-    const canvas = await html2canvas(fieldEl);
+    const canvas = await html2canvas(fieldEl, {
+      scale: 2, // 高解像度化で文字ずれ軽減
+      useCORS: true,
+    });
     const link = document.createElement("a");
     link.download = "field.png";
     link.href = canvas.toDataURL("image/png");
@@ -41,7 +52,8 @@ const App: React.FC = () => {
         style={{
           width: "60px",
           height: "90px",
-          background: "repeating-linear-gradient(45deg,#ff6f61,#ff6f61 10px,#ffcc00 10px,#ffcc00 20px)",
+          background:
+            "repeating-linear-gradient(45deg,#ff6f61,#ff6f61 10px,#ffcc00 10px,#ffcc00 20px)",
           border: "2px solid #333",
           borderRadius: "8px",
           margin: "0 auto 10px",
@@ -65,12 +77,13 @@ const App: React.FC = () => {
           minHeight: "120px",
           padding: "10px",
           display: "flex",
-          flexWrap: "wrap",
+          flexWrap: "nowrap", // 折り返さず横並び
           gap: "10px",
-          justifyContent: "center",
+          justifyContent: "flex-start",
+          overflow: "hidden", // はみ出し抑制
         }}
       >
-        <CardArea cards={field} />
+        <CardArea cards={field} onCardClick={returnCard} autoResize />
       </div>
 
       <button
